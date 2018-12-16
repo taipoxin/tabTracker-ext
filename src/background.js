@@ -1,9 +1,5 @@
-// import $ from './lib/jquery-3.3.1.min'
-
-// let arrOfTabs = [];
 const windowsInfo = {};
 
-// TODO: refactor
 function fillArr(windowId) {
   windowsInfo[windowId] = [];
   chrome.tabs.query({ windowId }, (tabs) => {
@@ -26,8 +22,7 @@ function searchTabByIndex(array, idx) {
 }
 
 function isNewUrlTab(tab) {
-  // console.log(tab)
-  // console.log(arrOfTabs)
+
   const arrOfTabs = windowsInfo[tab.windowId];
   if (!arrOfTabs) {
     windowsInfo[tab.windowId] = [];
@@ -36,10 +31,9 @@ function isNewUrlTab(tab) {
   console.log(tab);
   if (tab.index >= arrOfTabs.length) {
     console.log(`tab.index(${tab.index}) >= arrOfTabs.length(${arrOfTabs.length})`);
-    // по любому новая
+  
     return true;
   }
-  // совпадает, нельзя считать за изменение
   if (arrOfTabs[tab.index].title === tab.title) {
     return false;
   }
@@ -62,9 +56,11 @@ function sendAjaxObject(obj) {
     success(response) { // Данные отправлены успешно
       console.log(response);
     },
-    error(response) { // Данные не отправлены
+    error(xhr, status, error) { // Данные не отправлены
       console.log('error');
-      console.log(response);
+      console.log(xhr);
+      console.log(status);
+      console.log(error);
     },
   });
 }
@@ -79,8 +75,8 @@ function onUpdateListener(tabId, changeInfo, tab) {
       // отправляем инфу о новом tab
       console.log('найден новый/обновление url');
       console.log(`title: ${tab.title},\n url: ${tab.url}`);
-      // send {title, datetime}
-      sendAjaxObject({ title: tab.title, datetime: new Date() });
+      // send {user: Number, title: String, datetime: Number}
+      sendAjaxObject({user: 1, title: tab.title, datetime: new Date().getTime() });
     }
     // в любом случае
     // обновляем список вкладок
