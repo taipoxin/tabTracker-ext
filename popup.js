@@ -4,7 +4,7 @@ function fillArr() {
     arrOfTabs = [];
     chrome.tabs.query({ currentWindow: true }, function (tabs) {
         tabs.forEach(tab => {
-            arrOfTabs.push({index: tab.index, title: tab.title, url: tab.url })
+            arrOfTabs.push({ index: tab.index, title: tab.title, url: tab.url })
         });
     });
 }
@@ -34,19 +34,48 @@ function isNewUrlTab(tab) {
         return true;
     }
     // совпадает, нельзя считать за изменение
-    if(arrOfTabs[tab.index].url === tab.url) {
+    if (arrOfTabs[tab.index].title === tab.title) {
         return false;
     }
     let oldTab = searchTabByIndex(tab.index);
-    if (oldTab && oldTab.url === tab.url) {
+    if (oldTab && oldTab.title === tab.title) {
         return false;
     }
     return true;
 }
 
+function createPostReq() {
+    let f = document.createElement('form');
+    f.method = 'POST'
+    f.action = 'http://localhost:4500/new'
+
+
+    let title = document.createElement('input')
+    title.type = 'text';
+    title.name = 'title';
+
+
+    let datetime = document.createElement('input')
+    datetime.type = 'text';
+    datetime.name = 'datetime';
+
+    let submit = document.createElement('input')
+    submit.type = 'submit';
+    submit.name = 'sendPostReq';
+
+    f.appendChild(title);
+    f.appendChild(datetime);
+    f.appendChild(submit);
+    
+    
+    // f.hidden = 'true'
+    document.body.appendChild(f);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     var getTabsBtn = document.getElementById('getTabs');
     // первоначальная загрузка
+    createPostReq()
     fillArr();
     getTabsBtn.addEventListener('click', function () {
         retriveTabs();
@@ -61,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 // новый url
                 // отправляем инфу о новом tab
                 console.log(`найден новый/обновление url`);
-                console.log(`title: ${tab.title},\n url: ${tab.url}`);
+                console.log(`title: ${tab.title},\n url: ${tab.url}`)
+                // send {title, datetime}
+
             }
             // в любом случае
             // обновляем список вкладок
