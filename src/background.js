@@ -65,22 +65,31 @@ function sendAjaxObject(obj) {
   });
 }
 
+function checkTab(tab) {
+  if (isNewUrlTab(tab)) {
+    // новый url
+    // отправляем инфу о новом tab
+    console.log('найден новый/обновление url');
+    console.log(`title: ${tab.title},\n url: ${tab.url}`);
+    // send {user: Number, title: String, datetime: Number}
+    sendAjaxObject({user: 1, title: tab.title, datetime: new Date().getTime() });
+  }
+  // в любом случае
+  // обновляем список вкладок
+  fillArr(tab.windowId);
+}
+
 function onUpdateListener(tabId, changeInfo, tab) {
   // console.log(`tabId: `, tabId)
   // console.log(`changeInfo: `, changeInfo)
   // console.log(`tab: `, tab)
-  if (changeInfo.status === 'complete') {
-    if (isNewUrlTab(tab)) {
-      // новый url
-      // отправляем инфу о новом tab
-      console.log('найден новый/обновление url');
-      console.log(`title: ${tab.title},\n url: ${tab.url}`);
-      // send {user: Number, title: String, datetime: Number}
-      sendAjaxObject({user: 1, title: tab.title, datetime: new Date().getTime() });
+  if (changeInfo.title) {
+    if (tab.status === 'complete') {
+      checkTab(tab)
     }
-    // в любом случае
-    // обновляем список вкладок
-    fillArr(tab.windowId);
+  }
+  else if (changeInfo.status === 'complete') {
+    checkTab(tab)
   }
 }
 
